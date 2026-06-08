@@ -81,4 +81,6 @@ app.use("/setting", settingRoute)
 app.use("/message", messageRoute)
 app.use("/social", postsAndComments)
 
+module.exports = app;
+
 
