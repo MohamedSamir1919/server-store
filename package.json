@@ -1,0 +1,72 @@
+{
+ 
+  "dependencies": {
+ 
+   
+  "cors": "^2.8.5",
+ 
+   
+  "crypto-js": "^4.2.0",
+ 
+   
+  "dotenv": "^16.4.7",
+ 
+   
+  "exceljs": "^4.4.0",
+ 
+   
+  "express": "^4.21.2",
+ 
+   
+  "jose": "^5.9.6",
+ 
+   
+  "jsonwebtoken": "^9.0.3",
+ 
+   
+  "mongoose": "^8.21.0",
+ 
+   
+  "multer": "^1.4.5-lts.1",
+ 
+   
+  "nodemon": "^3.1.11",
+ 
+   
+  "react-helmet-async": "^3.0.0",
+ 
+   
+  "swagger-ui-express": "^5.0.1",
+ 
+   
+  "vite": "^7.3.1",
+ 
+   
+  "xlsx": "^0.18.5"
+ 
+  },
+ 
+  "name": "velar",
+ 
+  "version": "1.0.0",
+ 
+  "main": "index.js",
+ 
+  "scripts": {
+ 
+   
+  "test": "echo \"Error: no test specified\" && exit 1",
+ 
+   
+  "start": "nodemon index.js"
+ 
+  },
+ 
+  "author": "Mohamed Samir",
+ 
+  "license": "ISC",
+ 
+  "description": "",
+ 
+  "type": "commonjs"
+}
