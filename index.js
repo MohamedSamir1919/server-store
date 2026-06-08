@@ -58,11 +58,13 @@ app.use(express.json());
 app.use('/images', express.static(path.join(__dirname, 'images')));
 // app.use(express.static(path.resolve('./images')));
 
-app.use(
-  cors({ origin: "*" }
+app.use(cors({
+  origin: '*', // مؤقتاً اكتب '*' عشان يسمح لأي فرونت إند يكلمه، ولما ترفع الفرونت إند حط الرابط بتاعه هنا
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
-  )
-);
+app.use(express.json());
 
 
 app.use(ErrorHandler);
