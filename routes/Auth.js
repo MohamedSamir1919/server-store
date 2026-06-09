@@ -21,7 +21,7 @@ router.post('/login', async (req, res) => {
             const bytes = cryptoJS.AES.decrypt(password, process.env.CRYPTO_JS_PASS);
             const originalPass = bytes.toString(cryptoJS.enc.Utf8);
 
-            if (body.password === originalPass) {
+            if (body.password == originalPass) {
                 const token = jwt.sign(userData, process.env.JWT_PASS);
                 return res.status(200).json(token);
             }
