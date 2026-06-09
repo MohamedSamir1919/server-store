@@ -9,67 +9,53 @@ const cryptoJS = require("crypto-js")
 require('dotenv').config()
 
 // dotenv.config();
-router.post('/login',async(req,res)=>{
-    try{
-        const body = await req.body;
-        const user = await User.find({email : body.email})
-        console.log("user",user[0])
-        if(user.length > 0){
-            const {password,...u} = user[0]._doc
-            console.log("password",password)
-            console.log("u",u)
-            const originalPass = cryptoJS.AES.decrypt(password,process.env.CRYPTO_JS_PASS).toString(cryptoJS.enc.Utf8);
-            console.log("originalPass",originalPass)
+router.post('/login', async (req, res) => {
+    try {
+        const body = req.body;
+        const user = await User.findOne({ email: body.email });
 
-            console.log("originalPass",originalPass)
-          
+        if (user) {
+            const userObj = user.toObject();
+            const { password, ...userData } = userObj;
 
-            if(body.password == originalPass){
-                const token = jwt.sign(u,process.env.JWT_PASS)
-                res.status(200).json(token)
+            const bytes = cryptoJS.AES.decrypt(password, process.env.CRYPTO_JS_PASS);
+            const originalPass = bytes.toString(cryptoJS.enc.Utf8);
+
+            if (body.password === originalPass) {
+                const token = jwt.sign(userData, process.env.JWT_PASS);
+                return res.status(200).json(token);
             }
             else {
-                res.status(401).json("Wrong password")
+                return res.status(401).json("Wrong password");
             }
         }
-        else{
-            res.status(403).json("You have to signup")
+        else {
+            return res.status(403).json("You have to signup");
         }
     }
-    catch(err){
-        console.log(err)
-        console.log("****************************************************")
-        res.status(400).json(err)
+    catch (err) {
+        console.error("Login Error:", err);
+        return res.status(400).json({ message: err.message || "Internal Server Error" });
     }
 })
 
-router.post('/',async(req,res)=>{
-    try{
-
-        const body = await req.body;
-        const {password,...u} = body
-        const user = await User.find({email : body.email})
-        if(user.length > 0){
-            res.status(302).json("You allready joined")
+router.post('/', async (req, res) => {
+    try {
+        const body = req.body;
+        const { password, ...userData } = body;
+        const user = await User.findOne({ email: body.email });
+        if (user) {
+            return res.status(302).json("You already joined");
         }
-        else{
-            const cryptoPass = cryptoJS.AES.encrypt(password,process.env.CRYPTO_JS_PASS).toString();
-            const newUser = Object.assign(body,{password:cryptoPass})
-            // console.log(newUser)
-
-            await User.create(newUser)
-
-
-            let token =  jwt.sign(u,process.env.JWT_PASS)
-
-           
-            console.log("token",token)
-            
-            res.status(200).json(token)
+        else {
+            const cryptoPass = cryptoJS.AES.encrypt(password, process.env.CRYPTO_JS_PASS).toString();
+            const newUser = Object.assign(body, { password: cryptoPass })
+            await User.create(newUser);
+            const token = jwt.sign(userData, process.env.JWT_PASS);
+            return res.status(200).json(token);
         }
-
-    }  catch(err){
-        res.json(err)
+    } catch (err) {
+        return res.status(400).json({ message: err.message || err });
     }
 })
 
@@ -77,4 +63,4 @@ module.exports = router;
 
 
 
-  
+
