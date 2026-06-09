@@ -11,14 +11,14 @@ require('dotenv').config()
 // dotenv.config();
 router.post('/login', async (req, res) => {
     try {
-        const body = req.body;
+        const body = await req.body;
         const user = await User.findOne({ email: body.email });
 
         if (user) {
             const userObj = user.toObject();
             const { password, ...userData } = userObj;
 
-            const bytes = cryptoJS.AES.decrypt(password, process.env.CRYPTO_JS_PASS);
+            const bytes = await cryptoJS.AES.decrypt(password, process.env.CRYPTO_JS_PASS);
             const originalPass = bytes.toString(cryptoJS.enc.Utf8);
 
             if (body.password == originalPass) {
@@ -41,7 +41,7 @@ router.post('/login', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-        const body = req.body;
+        const body = await req.body;
         const { password, ...userData } = body;
         const user = await User.findOne({ email: body.email });
         if (user) {
