@@ -6,6 +6,7 @@ const ProductsImages = require("../models/ProductsImages")
 const Attributes = require("../models/DynamicAttributes")
 const { verifyToken, verifyTokenAndAdmin } = require('./verifyToken');
 const Category = require("../models/Category");
+const multer = require('multer')
 
 
 
@@ -24,7 +25,6 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 
-// const multer  = require('multer')
 // const storage = multer.diskStorage({
 //     destination: function (req, file, cb) {
 //         cb(null, './images/products/'); // Specify the folder to store files
