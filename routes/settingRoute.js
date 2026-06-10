@@ -70,7 +70,7 @@ router.post('/add-banner', verifyTokenAndAdmin, upload.single('imgFile'), async 
         body.img = secureUrl;
 
         const newBanner = await Banners.create(body)
-        await newBanner.save();
+        awaitnewBanner.save();
         res.status(200).json(newBanner)
     } catch (err) {
         console.log(err)
