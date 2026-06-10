@@ -147,154 +147,154 @@ router.post('/:slug', verifyTokenAndAdmin, async (req, res) => {
     try {
         const body = await req.body
 
-        if (body?.every((b) => {
-            return (
-                b.hasOwnProperty("slug")
-                & b.hasOwnProperty("title")
-                & b.hasOwnProperty("description")
+        // if (body?.every((b) => {
+        //     return (
+        //         b.hasOwnProperty("slug")
+        //         & b.hasOwnProperty("title")
+        //         & b.hasOwnProperty("description")
 
 
-            )
-        })) {
-            let slugs = await Slug.find();
-            let cats = await Category.find()
+        //     )
+        // })) {
+        let slugs = await Slug.find();
+        let cats = await Category.find()
 
-            if (req.params.slug == "many") {
-                const newProducts = body
+        if (req.params.slug == "many") {
+            const newProducts = body
 
-                const categories = newProducts.reduce((categoriess, curr) => {
-                    const cat = cats.filter((c) => { c.name == curr.name })
-                    if (cats.some((c) => c.name == curr.name)) {
-                        return categoriess
+            const categories = newProducts.reduce((categoriess, curr) => {
+                const cat = cats.filter((c) => { c.name == curr.name })
+                if (cats.some((c) => c.name == curr.name)) {
+                    return categoriess
+                }
+                else if (cat?.length > 0)
+                    return categoriess
+                else {
+                    categoriess = [...categoriess, { name: curr.category }]
+
+                    return categoriess
+                }
+            }, [])
+            function removeDuplicates(arr) {
+                const uniqueNames = new Set();
+                return arr.filter(obj => {
+                    if (uniqueNames.has(obj.name)) {
+                        return false;
+                    } else {
+                        uniqueNames.add(obj.name);
+                        return true;
                     }
-                    else if (cat?.length > 0)
-                        return categoriess
+                });
+            }
+            if (categories) {
+
+                let categoriess = removeDuplicates(categories);
+
+                categoriess = categoriess.reduce((ca, curr) => {
+                    if (cats.some((c) => c.name = curr.name)) {
+                        return ca
+                    }
                     else {
-                        categoriess = [...categoriess, { name: curr.category }]
-
-                        return categoriess
+                        ca.push({ name: curr.name })
+                        return ca
                     }
                 }, [])
-                function removeDuplicates(arr) {
-                    const uniqueNames = new Set();
-                    return arr.filter(obj => {
-                        if (uniqueNames.has(obj.name)) {
-                            return false;
-                        } else {
-                            uniqueNames.add(obj.name);
-                            return true;
-                        }
-                    });
+
+                if (categories?.length > 0) {
+
+                    const categoriesInsert = await Category.insertMany(categoriess)
                 }
-                if (categories) {
-
-                    let categoriess = removeDuplicates(categories);
-
-                    categoriess = categoriess.reduce((ca, curr) => {
-                        if (cats.some((c) => c.name = curr.name)) {
-                            return ca
-                        }
-                        else {
-                            ca.push({ name: curr.name })
-                            return ca
-                        }
-                    }, [])
-
-                    if (categories?.length > 0) {
-
-                        const categoriesInsert = await Category.insertMany(categoriess)
-                    }
-                }
-                const details = newProducts.map((pr) => {
+            }
+            const details = newProducts.map((pr) => {
 
 
-                    pr.details.split('&').map((d) => {
-                        [key, value] = d.split(":")
+                pr.details.split('&').map((d) => {
+                    [key, value] = d.split(":")
 
-                        return { key: value, slug: pr.slug }
-                    })
-
-
-                }
-                )
-
-                cats = await Category.find({})
-
-
-
-                const slugs = newProducts.reduce((slugss, curr) => {
-
-                    const cat = cats.filter(c => c.name === curr.category)
-
-                    slugss.push({ category: cat[0]?._id, code: curr.slug })
-
-                    return slugss
-                    //                 const newSlug = {product:createProduct._id,category:category._id,code:p.slug}
-
-                }, [])
-
-
-                const slugInsert = async () => {
-                    await slugs.forEach(async (s) => {
-                        try {
-                            await Slug.create(s)
-
-
-                        } catch (err) { console.log(err) }
-                    })
-                }
-                const products = newProducts.forEach(async (curr) => {
-                    const { slug, category, ...prod } = curr
-
-                    // let slugId =  slgs?.filter(s=> s && s?.code == slug?.toString())[0]?._id;
-                    let deatailsArray = prod.details?.split('&').map(item => {
-                        const [key, value] = item.split(':');
-                        return { [key]: value };
-                    });
-                    // console.log(slugId)
-                    let product;
-
-                    let queue = async () => {
-                        const slgs = await Slug.find();
-
-                        let slugId = await slgs?.filter(s => s.code == slug?.toString())[0]?._id;
-                        console.log('slugId:', slugId)
-                        console.log('slug:', slug)
-
-                        product = Object.assign(prod, { slug: slugId, details: deatailsArray.map(d => { return d }) })
-
-                    }
-                    // if(slugId){
-
-                    //     let newProduct = new Product(product)
-                    //     await newProduct.save();
-
-                    // }else{
-
-
-                    // }
-                    slugInsert().then(async () => {
-
-                        queue().then(async () => {
-                            let newProduct = new Product(product)
-                            await newProduct.save();
-                        })
-                    })
+                    return { key: value, slug: pr.slug }
                 })
 
 
             }
-            else {
+            )
 
-                const newProduct = new Product(body)
-                await newProduct.save();
+            cats = await Category.find({})
+
+
+
+            const slugs = newProducts.reduce((slugss, curr) => {
+
+                const cat = cats.filter(c => c.name === curr.category)
+
+                slugss.push({ category: cat[0]?._id, code: curr.slug })
+
+                return slugss
+                //                 const newSlug = {product:createProduct._id,category:category._id,code:p.slug}
+
+            }, [])
+
+
+            const slugInsert = async () => {
+                await slugs.forEach(async (s) => {
+                    try {
+                        await Slug.create(s)
+
+
+                    } catch (err) { console.log(err) }
+                })
             }
-            return res.status(200).json(body)
+            const products = newProducts.forEach(async (curr) => {
+                const { slug, category, ...prod } = curr
+
+                // let slugId =  slgs?.filter(s=> s && s?.code == slug?.toString())[0]?._id;
+                let deatailsArray = prod.details?.split('&').map(item => {
+                    const [key, value] = item.split(':');
+                    return { [key]: value };
+                });
+                // console.log(slugId)
+                let product;
+
+                let queue = async () => {
+                    const slgs = await Slug.find();
+
+                    let slugId = await slgs?.filter(s => s.code == slug?.toString())[0]?._id;
+                    console.log('slugId:', slugId)
+                    console.log('slug:', slug)
+
+                    product = Object.assign(prod, { slug: slugId, details: deatailsArray.map(d => { return d }) })
+
+                }
+                // if(slugId){
+
+                //     let newProduct = new Product(product)
+                //     await newProduct.save();
+
+                // }else{
+
+
+                // }
+                slugInsert().then(async () => {
+
+                    queue().then(async () => {
+                        let newProduct = new Product(product)
+                        await newProduct.save();
+                    })
+                })
+            })
+
+
         }
         else {
 
-            return res.status(400).json("please write all nessaccery fields")
+            const newProduct = new Product(body)
+            await newProduct.save();
         }
+        return res.status(200).json(body)
+        // }
+        // else {
+
+        //     return res.status(400).json("please write all nessaccery fields")
+        // }
     } catch (err) {
         console.log(err)
         res.json(err)
@@ -315,19 +315,94 @@ router.post("/del/:id", verifyTokenAndAdmin, async (req, res) => {
     }
 })
 
-router.post("/upload/images", verifyTokenAndAdmin, upload.any('images/products'), async (req, res) => {
+// router.post("/upload/images", verifyTokenAndAdmin, upload.any('images/products'), async (req, res) => {
+//     try {
+
+//         // const body = await req.body;
+//         // const proImages = await ProductsImages.insertMany(body)
+//         console.log('imgs uploaded')
+//         res.status(200).json("Done")
+//     }
+
+//     catch (err) {
+//         res.json(err)
+//     }
+// })
+
+
+
+router.post('/upload/images', upload.array('img', 10), async (req, res) => {
     try {
+        // 1. Check if any files were uploaded
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ message: 'No images uploaded.' });
+        }
 
-        // const body = await req.body;
-        // const proImages = await ProductsImages.insertMany(body)
-        console.log('imgs uploaded')
-        res.status(200).json("Done")
-    }
+        const uploadedImageDetails = [];
 
-    catch (err) {
-        res.json(err)
+        // 2. Process each uploaded file
+        for (const file of req.files) {
+            // Convert the file buffer to a base64 string for Cloudinary upload
+            const base64Image = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+
+            // Upload image to Cloudinary
+            const cloudinaryUploadResult = await cloudinary.uploader.upload(base64Image, {
+                resource_type: 'image',
+                folder: 'store_product_images', // Optional: Organize your product images in a specific folder in Cloudinary
+                // You can also set a custom public_id here if you want to control the filename in Cloudinary,
+                // e.g., public_id: file.originalname.split('.')[0], but ensure uniqueness to avoid overwrites.
+            });
+
+            const cloudinarySecureUrl = cloudinaryUploadResult.secure_url;
+            uploadedImageDetails.push({
+                originalName: file.originalname,
+                cloudinaryUrl: cloudinarySecureUrl,
+                publicId: cloudinaryUploadResult.public_id,
+            });
+
+            // 3. Find the product by its original filename and update its 'img' field
+            // WARNING: This approach (finding by original filename) has several limitations:
+            //   - Original filenames are not guaranteed to be unique across different products.
+            //   - If a product's 'img' field is already updated to a Cloudinary URL,
+            //     subsequent uploads using the original filename will not find that product.
+            //   - For a more robust solution, consider sending the product's unique ID
+            //     from the frontend along with the image upload to explicitly link the image.
+            const productToUpdate = await Product.findOne({ img: file.originalname });
+
+            if (productToUpdate) {
+                // Update the product's 'img' field with the new Cloudinary URL
+                productToUpdate.img = cloudinarySecureUrl;
+                await productToUpdate.save();
+                console.log(`Product ${productToUpdate._id} updated with Cloudinary URL: ${cloudinarySecureUrl}`);
+            } else {
+                console.warn(`No product found with original image filename '${file.originalname}'. Image uploaded to Cloudinary: ${cloudinarySecureUrl}`);
+                // You might want to handle cases where no product is found:
+                // - Delete the uploaded image from Cloudinary if it's not linked to any product.
+                //   await cloudinary.uploader.destroy(cloudinaryUploadResult.public_id);
+                // - Store the Cloudinary URL in a temporary collection for manual linking.
+            }
+        }
+
+        // 4. Send a success response back to the frontend
+        res.status(200).json({
+            message: 'Images uploaded and products updated successfully (where matched by original filename).',
+            uploadedImages: uploadedImageDetails,
+        });
+
+    } catch (error) {
+        console.error('Error during image upload or product update:', error);
+        // Provide a more informative error response
+        res.status(500).json({
+            message: 'Server error during image upload or product update.',
+            error: error.message,
+            details: error.stack, // Include stack trace for debugging in development
+        });
     }
-})
+});
+
+
+
+
 
 router.post("/upload/imagesDictionary", verifyTokenAndAdmin, upload.any('images/products'), async (req, res) => {
     try {
