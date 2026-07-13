@@ -3,7 +3,8 @@ const router = express.Router();
 const User = require("../models/User")
 const jwt = require("jsonwebtoken")
 const jose = require('jose')
-const cryptoJS = require("crypto-js")
+const cryptoJS = require("crypto-js");
+const { verifyTokenAndAdmin } = require("./verifyToken");
 // undefined
 // const dotenv = require('dotenv');
 require('dotenv').config()
@@ -38,7 +39,18 @@ router.post('/login', async (req, res) => {
         return res.status(400).json({ message: err.message || "Internal Server Error" });
     }
 })
+router.post('/activate', verifyTokenAndAdmin, async (req, res) => {
+    const { email, activateCode } = req.body;
+    const user = await User.findOne({ email: email });
+    if (user) {
+        user.activate = true;
+        await user.save();
+        return res.status(200).json("Account activated successfully");
+    } else {
+        return res.status(404).json("User not found");
+    }
 
+})
 router.post('/', async (req, res) => {
     try {
         const body = await req.body;
