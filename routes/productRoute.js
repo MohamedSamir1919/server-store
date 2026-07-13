@@ -146,164 +146,268 @@ router.get("/get-imgs", async (req, res) => {
     }
 })
 
+// router.post('/:slug', verifyTokenAndAdmin, async (req, res) => {
+//     try {
+//         const body = await req.body
+
+//         // if (body?.every((b) => {
+//         //     return (
+//         //         b.hasOwnProperty("slug")
+//         //         & b.hasOwnProperty("title")
+//         //         & b.hasOwnProperty("description")
+
+
+//         //     )
+//         // })) {
+//         let slugs = await Slug.find();
+//         let cats = await Category.find()
+
+//         if (req.params.slug == "many") {
+//             const newProducts = body
+
+//             const categories = newProducts.reduce((categoriess, curr) => {
+//                 const cat = cats.filter((c) => { c.name == curr.name })
+//                 if (cats.some((c) => c.name == curr.name)) {
+//                     return categoriess
+//                 }
+//                 else if (cat?.length > 0)
+//                     return categoriess
+//                 else {
+//                     categoriess = [...categoriess, { name: curr.category }]
+
+//                     return categoriess
+//                 }
+//             }, [])
+//             function removeDuplicates(arr) {
+//                 const uniqueNames = new Set();
+//                 return arr.filter(obj => {
+//                     if (uniqueNames.has(obj.name)) {
+//                         return false;
+//                     } else {
+//                         uniqueNames.add(obj.name);
+//                         return true;
+//                     }
+//                 });
+//             }
+//             if (categories) {
+
+//                 let categoriess = removeDuplicates(categories);
+
+//                 categoriess = categoriess.reduce((ca, curr) => {
+//                     if (cats.some((c) => c.name = curr.name)) {
+//                         return ca
+//                     }
+//                     else {
+//                         ca.push({ name: curr.name })
+//                         return ca
+//                     }
+//                 }, [])
+
+//                 if (categories?.length > 0) {
+
+//                     const categoriesInsert = await Category.insertMany(categoriess)
+//                 }
+//             }
+//             const details = newProducts.map((pr) => {
+
+
+//                 pr.details.split('&').map((d) => {
+//                     [key, value] = d.split(":")
+
+//                     return { key: value, slug: pr.slug }
+//                 })
+
+
+//             }
+//             )
+
+//             cats = await Category.find({})
+
+
+
+//             const slugs = newProducts.reduce((slugss, curr) => {
+
+//                 const cat = cats.filter(c => c.name === curr.category)
+
+//                 slugss.push({ category: cat[0]?._id, code: curr.slug })
+
+//                 return slugss
+//                 //                 const newSlug = {product:createProduct._id,category:category._id,code:p.slug}
+
+//             }, [])
+
+
+//             const slugInsert = async () => {
+//                 await slugs.forEach(async (s) => {
+//                     try {
+//                         await Slug.create(s)
+
+
+//                     } catch (err) { console.log(err) }
+//                 })
+//             }
+//             const products = newProducts.forEach(async (curr) => {
+//                 const { slug, category, ...prod } = curr
+
+//                 // let slugId =  slgs?.filter(s=> s && s?.code == slug?.toString())[0]?._id;
+//                 let deatailsArray = prod.details?.split('&').map(item => {
+//                     const [key, value] = item.split(':');
+//                     return { [key]: value };
+//                 });
+//                 // console.log(slugId)
+//                 let product;
+
+//                 let queue = async () => {
+//                     const slgs = await Slug.find();
+
+//                     let slugId = await slgs?.filter(s => s.code == slug?.toString())[0]?._id;
+//                     console.log('slugId:', slugId)
+//                     console.log('slug:', slug)
+
+//                     product = Object.assign(prod, { slug: slugId, details: deatailsArray.map(d => { return d }) })
+
+//                 }
+//                 // if(slugId){
+
+//                 //     let newProduct = new Product(product)
+//                 //     await newProduct.save();
+
+//                 // }else{
+
+
+//                 // }
+//                 slugInsert().then(async () => {
+
+//                     queue().then(async () => {
+//                         let newProduct = new Product(product)
+//                         await newProduct.save();
+//                     })
+//                 })
+//             })
+
+
+//         }
+//         else {
+
+//             const newProduct = new Product(body)
+//             await newProduct.save();
+//         }
+//         return res.status(200).json(body)
+//         // }
+//         // else {
+
+//         //     return res.status(400).json("please write all nessaccery fields")
+//         // }
+//     } catch (err) {
+//         console.log(err)
+//         res.json(err)
+//     }
+// })
+
 router.post('/:slug', verifyTokenAndAdmin, async (req, res) => {
     try {
-        const body = await req.body
+        const body = req.body; // إزالة الـ await لـ req.body
 
-        // if (body?.every((b) => {
-        //     return (
-        //         b.hasOwnProperty("slug")
-        //         & b.hasOwnProperty("title")
-        //         & b.hasOwnProperty("description")
-
-
-        //     )
-        // })) {
-        let slugs = await Slug.find();
-        let cats = await Category.find()
-
-        if (req.params.slug == "many") {
-            const newProducts = body
-
-            const categories = newProducts.reduce((categoriess, curr) => {
-                const cat = cats.filter((c) => { c.name == curr.name })
-                if (cats.some((c) => c.name == curr.name)) {
-                    return categoriess
-                }
-                else if (cat?.length > 0)
-                    return categoriess
-                else {
-                    categoriess = [...categoriess, { name: curr.category }]
-
-                    return categoriess
-                }
-            }, [])
-            function removeDuplicates(arr) {
-                const uniqueNames = new Set();
-                return arr.filter(obj => {
-                    if (uniqueNames.has(obj.name)) {
-                        return false;
-                    } else {
-                        uniqueNames.add(obj.name);
-                        return true;
-                    }
-                });
-            }
-            if (categories) {
-
-                let categoriess = removeDuplicates(categories);
-
-                categoriess = categoriess.reduce((ca, curr) => {
-                    if (cats.some((c) => c.name = curr.name)) {
-                        return ca
-                    }
-                    else {
-                        ca.push({ name: curr.name })
-                        return ca
-                    }
-                }, [])
-
-                if (categories?.length > 0) {
-
-                    const categoriesInsert = await Category.insertMany(categoriess)
-                }
-            }
-            const details = newProducts.map((pr) => {
-
-
-                pr.details.split('&').map((d) => {
-                    [key, value] = d.split(":")
-
-                    return { key: value, slug: pr.slug }
-                })
-
-
-            }
-            )
-
-            cats = await Category.find({})
-
-
-
-            const slugs = newProducts.reduce((slugss, curr) => {
-
-                const cat = cats.filter(c => c.name === curr.category)
-
-                slugss.push({ category: cat[0]?._id, code: curr.slug })
-
-                return slugss
-                //                 const newSlug = {product:createProduct._id,category:category._id,code:p.slug}
-
-            }, [])
-
-
-            const slugInsert = async () => {
-                await slugs.forEach(async (s) => {
-                    try {
-                        await Slug.create(s)
-
-
-                    } catch (err) { console.log(err) }
-                })
-            }
-            const products = newProducts.forEach(async (curr) => {
-                const { slug, category, ...prod } = curr
-
-                // let slugId =  slgs?.filter(s=> s && s?.code == slug?.toString())[0]?._id;
-                let deatailsArray = prod.details?.split('&').map(item => {
-                    const [key, value] = item.split(':');
-                    return { [key]: value };
-                });
-                // console.log(slugId)
-                let product;
-
-                let queue = async () => {
-                    const slgs = await Slug.find();
-
-                    let slugId = await slgs?.filter(s => s.code == slug?.toString())[0]?._id;
-                    console.log('slugId:', slugId)
-                    console.log('slug:', slug)
-
-                    product = Object.assign(prod, { slug: slugId, details: deatailsArray.map(d => { return d }) })
-
-                }
-                // if(slugId){
-
-                //     let newProduct = new Product(product)
-                //     await newProduct.save();
-
-                // }else{
-
-
-                // }
-                slugInsert().then(async () => {
-
-                    queue().then(async () => {
-                        let newProduct = new Product(product)
-                        await newProduct.save();
-                    })
-                })
-            })
-
-
-        }
-        else {
-
-            const newProduct = new Product(body)
+        // لو برودكت واحد عادي
+        if (req.params.slug !== "many") {
+            const newProduct = new Product(body);
             await newProduct.save();
+            return res.status(200).json(newProduct);
         }
-        return res.status(200).json(body)
-        // }
-        // else {
 
-        //     return res.status(400).json("please write all nessaccery fields")
-        // }
+        // ================= [ حالة المنتجات الكثيرة - MANY ] =================
+        const newProducts = body;
+        if (!Array.isArray(newProducts) || newProducts.length === 0) {
+            return res.status(400).json({ message: "Invalid or empty products array" });
+        }
+
+        // 1. جلب البيانات الحالية من الداتابيز دفعة واحدة لتوفير الوقت
+        let existingCats = await Category.find({});
+        let existingSlugs = await Slug.find({});
+
+        // 2. استخراج وتجهيز الكاتيجوريز الجديدة اللي مش موجودة في الـ DB
+        const uniqueIncomingCats = [...new Set(newProducts.map(p => p.category).filter(Boolean))];
+        const catsToInsert = [];
+
+        for (const catName of uniqueIncomingCats) {
+            if (!existingCats.some(c => c.name === catName)) {
+                catsToInsert.push({ name: catName });
+            }
+        }
+
+        // حفظ الكاتيجوريز الجديدة دفعة واحدة
+        if (catsToInsert.length > 0) {
+            const insertedCats = await Category.insertMany(catsToInsert);
+            existingCats = [...existingCats, ...insertedCats]; // تحديث القائمة المحلية
+        }
+
+        // 3. إنشاء وتجهيز الـ Slugs الجديدة
+        const slugsToInsert = [];
+        for (const prod of newProducts) {
+            const matchingCat = existingCats.find(c => c.name === prod.category);
+            const catId = matchingCat ? matchingCat._id : null;
+
+            // التأكد إن الـ Slug مش موجود مسبقاً في الداتابيز ولا في القائمة اللي هتتحفظ
+            const slugExists = existingSlugs.some(s => s.code === String(prod.slug)) ||
+                slugsToInsert.some(s => s.code === String(prod.slug));
+
+            if (!slugExists && prod.slug) {
+                slugsToInsert.push({
+                    category: catId,
+                    code: String(prod.slug)
+                });
+            }
+        }
+
+        // حفظ كل السلاجز الجديدة دفعة واحدة (Bulk) لسرعة خرافية
+        if (slugsToInsert.length > 0) {
+            const insertedSlugs = await Slug.insertMany(slugsToInsert);
+            existingSlugs = [...existingSlugs, ...insertedSlugs]; // تحديث القائمة المحلية
+        }
+
+        // 4. تجهيز مصفوفة المنتجات النهائية لحفظها دفعة واحدة
+        const productsToInsert = [];
+
+        for (const curr of newProducts) {
+            const { slug, category, details, ...prodData } = curr;
+
+            // إيجاد الـ ObjectId الخاص بالـ Slug اللي لسه منشأينه أو كان موجود
+            const matchingSlugObj = existingSlugs.find(s => s.code === String(slug));
+            const slugId = matchingSlugObj ? matchingSlugObj._id : null;
+
+            // تحويل الـ details من Text (key:value&key2:value2) إلى Array of Objects
+            let detailsArray = [];
+            if (details && typeof details === 'string') {
+                detailsArray = details.split('&').map(item => {
+                    const [key, value] = item.split(':');
+                    return { [key.trim()]: value ? value.trim() : "" };
+                });
+            }
+
+            productsToInsert.push({
+                ...prodData,
+                slug: slugId,
+                details: detailsArray
+            });
+        }
+
+        // 5. حفظ كل الـ 80 منتج (أو أكتر) في أمر واحد فقط للداتابيز!
+        let savedProducts = [];
+        if (productsToInsert.length > 0) {
+            savedProducts = await Product.insertMany(productsToInsert);
+        }
+
+        // إرجاع النتيجة بعد انتهاء كل العمليات بنجاح تام
+        return res.status(200).json({
+            message: `Successfully processed ${savedProducts.length} products!`,
+            products: savedProducts
+        });
+
     } catch (err) {
-        console.log(err)
-        res.json(err)
+        console.error("Bulk Insert Error:", err);
+        return res.status(500).json({ error: err.message || "Internal Server Error" });
     }
-})
-
+});
 router.post("/del/:id", verifyTokenAndAdmin, async (req, res) => {
     try {
         const body = await req.body;
