@@ -104,7 +104,7 @@ router.post("/add-collection", verifyTokenAndAdmin, upload.any(), async (req, re
 router.post("/add-collection-slugs", verifyTokenAndAdmin, async (req, res) => {
     try {
         // الفرونت إند بيبعت المصفوفة جوة كائن أو مباشرة، هنا بندعم الطريقتين
-        const body = req.body.slugsData || req.body;
+        const body = await req.body.slugsData || req.body;
 
         if (!Array.isArray(body)) {
             return res.status(400).json({ message: "Data must be an array" });
